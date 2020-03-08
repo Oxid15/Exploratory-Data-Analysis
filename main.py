@@ -3,30 +3,41 @@ import pandas as pd
 import sqlalchemy as sa
 from matplotlib import pyplot as plt
 
-class db():
-    pass
+# class db():
+#     pass
 
-class dbManager():
-    def connect(self, file):
-        pass
+# class dbManager():
+#     def connect(self, file):
+#         pass
 
-    def getTable(self):
-        pass
+#     def getTable(self):
+#         pass
 
 class dataManager():
-    def getData(self, table):
+    # def getData(self, table):
+    #     pass
+
+    def getSummaryInfo(self, table):
         pass
 
 class presenter():
-    pass
+    def appendTextToGUI(self, textBox, text):
+        self.gui.appendText(textBox, text)
+    
+    def onSummary(self):
+        tableIdx = self.gui.leftListBox.curselection()
+        if(len(tableIdx) > 0):
+            # table = self.dbManager.tables[tableIdx[0]]
+            # info = self.dataManager.getSummaryInfo(table)
+            #
+            self.appendTextToGUI(self.gui.mainTextBox, 'Example')
 
-class plottingManager():
-    pass
+# class plottingManager():
+#     pass
 
 class gui():
-    def __init__(self, presenter):
+    def __init__(self):
         self.window = tk.Tk()
-        self.presenter = presenter
 
     def WindowConfig(self):
         self.window.wm_title('Exploratory Data Analysis Program')
@@ -58,20 +69,30 @@ class gui():
 
         self.fileMenu = tk.Menu(self.topMenu)
         self.topMenu.add_cascade(label="File", menu=self.fileMenu)
-        self.fileMenu.add_command(label="Connect to database")#, command = )
+        self.fileMenu.add_command(label="Connect to database")#, command = self.presenter.onConnect)
 
         self.dataMenu = tk.Menu(self.topMenu)
         self.topMenu.add_cascade(label="Data", menu=self.dataMenu)
-        self.dataMenu.add_command(label="Summary")
+        self.dataMenu.add_command(label="Summary", command=self.presenter.onSummary)
 
     def mainloop(self):
         self.WindowConfig()
         self.mainScreen()
+        ################## DEBUG CODE
+        self.leftListBox.insert(tk.END, 'Table One')
+        ################## DEBUG CODE
         self.window.mainloop()
     
     def appendText(self, textBox, text):
         textBox.insert(tk.END, text)
 
-presenter = presenter()
-gui = gui(presenter)
-gui.mainloop()
+def main():
+    dm = dataManager()
+    pr = presenter()
+    g = gui()
+    g.presenter = pr
+    pr.gui = g
+    pr.dataManager = dm
+    g.mainloop()
+
+main()
