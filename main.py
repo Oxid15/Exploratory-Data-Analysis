@@ -82,12 +82,16 @@ class GUI():
         self.left_frame.grid(column = 0, row = 0, sticky='nwes')
         self.left_frame.columnconfigure(0, weight=100)
 
-        self.main_textbox = tk.Text(self.right_frame, font='Consolas')
-        self.main_textbox.grid(column = 0, row = 0, sticky='nwes')
+        self.main_textbox = tk.Text(self.right_frame, font='Consolas 9', wrap=tk.NONE)
+        self.main_textbox.grid(column = 0, row = 0, sticky='wes')
 
-        self.main_textbox_scrollbar = tk.Scrollbar(self.window)
-        self.main_textbox_scrollbar.configure(command=self.main_textbox.yview)
-        self.main_textbox_scrollbar.grid(row=0, column=2, sticky='ns')
+        self.main_textbox_vscrollbar = tk.Scrollbar(self.window)
+        self.main_textbox_vscrollbar.configure(command=self.main_textbox.yview)
+        self.main_textbox_vscrollbar.grid(row=0, column=2, sticky='ns')
+
+        self.main_textbox_hscrollbar = tk.Scrollbar(self.window, orient=tk.HORIZONTAL)
+        self.main_textbox_hscrollbar.configure(command=self.main_textbox.xview)
+        self.main_textbox_hscrollbar.grid(row=0, column=1, sticky='wes')
 
         self.left_listbox = tk.Listbox(self.left_frame, height=35)
         self.left_listbox.grid(column = 0, row = 0, sticky='nwe')
