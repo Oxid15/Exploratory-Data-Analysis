@@ -8,8 +8,20 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext import automap
 
 class DBManager():
+
+    def __init__(self):
+        self.numerical_types = [
+            'BIGINT',
+            'DECIMAL',
+            'FLOAT',
+            'INT',
+            'SMALLINT',
+            'NUMERIC',
+            'REAL']
+
     #TODO add exception handling
     def collect_metadata(self):
+        self.metadata = sa.MetaData()
         self.table_names = self.engine.table_names()
 
     #TODO replace default arguments with input boxes
@@ -21,8 +33,14 @@ class DBManager():
         self.collect_metadata()
 
     def get_column_names(self, table_name):
-        #self.engine..__table__.columns.keys()
-        pass
+        table = sa.Table(table_name, self.metadata, autoload=True, autoload_with=self.engine)
+        return table.columns.keys()
+
+    def get_connection(self):
+        return self.conn
+
+    def get_table(self, table_name):
+        return sa.Table(table_name, self.metadata, autoload=True, autoload_with=self.engine)
 
 class DataManager():
     def connect(self):
@@ -33,6 +51,19 @@ class DataManager():
 
     def get_column_names(self, table_name):
         return self.DBManager.get_column_names(table_name)
+
+    def compute_averages(self, table_name):
+        table = self.DBManager.get_table(table_name)
+        connection = self.DBManager.get_connection()
+        avgs = []
+        for column in table.columns.values():
+            if str(column.type) in self.DBManager.numerical_types:
+                query = sa.select([sa.func.avg(column)])
+                resproxy = connection.execute(query)
+                avgs.append(resproxy.fetchall()[0][0])
+            else:
+                avgs.append(None)
+        return avgs
 
     # def getSummaryInfo(self, table : pd.dataFrame):
     #     means = [column.mean() for column in table]
@@ -52,10 +83,22 @@ class Presenter():
         for table_name in table_names:
             self.append_elem_to_list_box(self.gui.left_listbox, table_name)
 
+    # def create_string_table(self, data):
+    #     pass
+
     def onSummary(self):
+        table_names = self.DataManager.get_table_names()
         tableIdx = self.gui.left_listbox.curselection()
-        if(len(tableIdx) > 0):
-            self.append_text_to_textbox(self.gui.main_textbox, 'Сработала заглушка')
+        if(len(tableIdx) == 1):
+            col_names = self.DataManager.get_column_names(table_names[tableIdx[0]])
+            col_avgs = self.DataManager.compute_averages(table_names[tableIdx[0]])
+
+            tb = self.gui.main_textbox
+            for name in col_names:
+                self.gui.append_text(tb, name + '|')
+            self.gui.append_text(tb, '\nmean:')
+            for avg in col_avgs:
+                self.gui.append_text(tb, str(avg) + ' | ')    
 
 # class Plotting_manager():
 #     def hists(self, table):
@@ -129,7 +172,7 @@ def main():
     pr = Presenter()
     g = GUI()
 
-    #connect objects
+    #connect objects to form MVP model
     g.Presenter = pr
     pr.gui = g
     pr.DataManager = dm
