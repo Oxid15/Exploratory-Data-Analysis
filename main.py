@@ -12,12 +12,16 @@ class DBManager():
     def __init__(self):
         self.numerical_types = [
             'BIGINT',
+            'INT',
+            'int',
+            'INTEGER',
+            'SMALLINT',
             'DECIMAL',
             'FLOAT',
-            'INT',
-            'SMALLINT',
             'NUMERIC',
-            'REAL']
+            'REAL',
+            'float'
+            ]
 
     #TODO add exception handling
     def collect_metadata(self):
